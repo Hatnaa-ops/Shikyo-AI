@@ -1,0 +1,1320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shikyo's AI - Ultra AI God Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Orbitron", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+            colors: {
+              bg: "#030305",
+              surface: "#0a0a0f",
+              card: "#0f0f16",
+              border: "#1c1c2a",
+              muted: "#52525b",
+              accent: "#00f0ff",
+              secondary: "#bf00ff",
+              tertiary: "#00ff9d",
+              danger: "#ff0055",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        --bg: #030305;
+        --surface: #0a0a0f;
+        --card: #0f0f16;
+        --border: #1c1c2a;
+        --accent: #00f0ff;
+        --secondary: #bf00ff;
+        --tertiary: #00ff9d;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: #fff;
+        overflow-x: hidden;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--accent), var(--secondary));
+        border-radius: 3px;
+      }
+
+      /* Fonts */
+      .font-display {
+        font-family: "Orbitron", sans-serif;
+      }
+
+      /* Grid Background */
+      .grid-bg {
+        background-image:
+          linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+      }
+
+      /* Glows */
+      .glow-accent {
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+      }
+      .glow-secondary {
+        box-shadow: 0 0 30px rgba(191, 0, 255, 0.4);
+      }
+      .text-glow {
+        text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+      }
+
+      /* Glassmorphism */
+      .glass {
+        background: rgba(10, 10, 15, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* Animations */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
+      }
+
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 0.4;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.1);
+        }
+      }
+
+      @keyframes orbit {
+        from {
+          transform: rotate(0deg) translateX(150px) rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg) translateX(150px) rotate(-360deg);
+        }
+      }
+
+      @keyframes scan-line {
+        0% {
+          top: -20%;
+        }
+        100% {
+          top: 120%;
+        }
+      }
+
+      @keyframes gradient-shift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      @keyframes reveal-up {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+      .animate-pulse-glow {
+        animation: pulse-glow 4s ease-in-out infinite;
+      }
+      .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient-shift 3s ease infinite;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Hero Canvas */
+      #heroCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      /* Command Palette */
+      .cmd-palette {
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s;
+      }
+      .cmd-palette.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Carousel */
+      .carousel-track {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding-bottom: 1rem;
+      }
+      .carousel-track::-webkit-scrollbar {
+        display: none;
+      }
+      .carousel-item {
+        scroll-snap-align: start;
+        flex-shrink: 0;
+      }
+
+      /* Progress Bars */
+      .progress-bar {
+        position: relative;
+        height: 100%;
+        border-radius: 9999px;
+        transition: width 1s ease-out;
+      }
+      .progress-bar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        animation: shimmer 2s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      /* 3D Tilt */
+      .tilt-card {
+        transform-style: preserve-3d;
+        transition: transform 0.2s ease;
+      }
+
+      /* Buttons */
+      .btn-glow {
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-glow::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--accent),
+          var(--secondary),
+          var(--tertiary),
+          var(--accent)
+        );
+        background-size: 400% 400%;
+        z-index: -1;
+        filter: blur(10px);
+        opacity: 0;
+        transition: opacity 0.3s;
+        animation: gradient-shift 3s ease infinite;
+      }
+      .btn-glow:hover::before {
+        opacity: 1;
+      }
+
+      /* Radar Chart */
+      .radar-bg {
+        background: radial-gradient(
+          circle,
+          rgba(0, 240, 255, 0.05) 0%,
+          transparent 70%
+        );
+      }
+    </style>
+  </head>
+  <body class="grid-bg">
+    <!-- Scroll Progress -->
+    <div
+      id="scrollProgress"
+      class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-accent via-secondary to-tertiary z-50"
+      style="width: 0%"
+    ></div>
+
+    <!-- Navbar -->
+    <nav
+      id="navbar"
+      class="fixed top-0 left-0 right-0 z-40 transition-all duration-300"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-secondary flex items-center justify-center glow-accent"
+            >
+              <span class="font-display font-black text-bg">S</span>
+            </div>
+            <span class="font-display font-bold text-lg tracking-widest"
+              >SHIKYO'S AI</span
+            >
+          </div>
+
+          <div class="hidden md:flex items-center gap-8 font-body text-sm">
+            <a
+              href="index2.html"
+              class="text-muted hover:text-accent transition-colors"
+              >Top 20 about</a
+            >
+            <a
+              href="#universe"
+              class="text-muted hover:text-accent transition-colors"
+              >Universe</a
+            >
+            <a
+              href="#lab"
+              class="text-muted hover:text-accent transition-colors"
+              >Lab</a
+            >
+            <a
+              href="#categories"
+              class="text-muted hover:text-accent transition-colors"
+              >Categories</a
+            >
+          </div>
+
+          <button
+            onclick="toggleCmdPalette()"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface border border-border hover:border-accent/50 transition-all text-sm text-muted"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <span class="hidden sm:inline">Search</span>
+            <kbd
+              class="hidden sm:inline px-2 py-0.5 rounded bg-bg text-xs border border-border"
+              >Ctrl+K</kbd
+            >
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Command Palette -->
+    <div
+      id="cmdPalette"
+      class="cmd-palette fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/80 backdrop-blur-sm"
+    >
+      <div
+        class="w-full max-w-2xl mx-4 rounded-2xl bg-surface border border-border shadow-2xl overflow-hidden"
+      >
+        <div class="flex items-center gap-3 p-4 border-b border-border">
+          <svg
+            class="w-5 h-5 text-accent"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            id="cmdInput"
+            type="text"
+            placeholder="Search 1000 AI tools..."
+            class="flex-1 bg-transparent text-white text-lg outline-none placeholder-muted font-body"
+          />
+          <kbd
+            class="px-2 py-1 rounded bg-bg text-xs text-muted border border-border"
+            >ESC</kbd
+          >
+        </div>
+        <div id="cmdResults" class="max-h-[60vh] overflow-y-auto p-2">
+          <div class="p-4 text-center text-muted text-sm">
+            Type to search the AI universe...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section
+      id="hero"
+      class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+    >
+      <canvas id="heroCanvas"></canvas>
+
+      <!-- Decorative Orbs -->
+      <div
+        class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[150px] animate-pulse-glow"
+      ></div>
+      <div
+        class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[150px] animate-pulse-glow"
+        style="animation-delay: 1s"
+      ></div>
+
+      <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
+        <div class="reveal">
+          <span
+            class="inline-block px-4 py-1 rounded-full bg-accent/10 border border-accent/30 text-accent text-xs font-medium tracking-widest mb-6 font-display"
+          >
+            SYSTEM ONLINE // 1000 TOOLS INDEXED
+          </span>
+        </div>
+
+        <h1
+          class="reveal font-display text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight mb-6 leading-none"
+          style="transition-delay: 0.1s"
+        >
+          <span class="block text-white">SHIKYO'S</span>
+          <span
+            class="block bg-gradient-to-r from-accent via-secondary to-tertiary bg-clip-text text-transparent animate-gradient"
+            >AI UNIVERSE</span
+          >
+        </h1>
+
+        <p
+          class="reveal text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto mb-12 font-body"
+          style="transition-delay: 0.2s"
+        >
+          The ultimate command center for AI discovery. Explore 50 categories,
+          compare tools, and build your intelligent future.
+        </p>
+
+        <div
+          class="reveal flex flex-col sm:flex-row items-center justify-center gap-4"
+          style="transition-delay: 0.3s"
+        >
+          <a
+            href="#top20"
+            class="btn-glow px-10 py-4 rounded-xl bg-white text-bg font-bold font-display tracking-wide transition-transform hover:scale-105"
+          >
+            ENTER UNIVERSE
+          </a>
+          <a
+            href="#categories"
+            class="px-10 py-4 rounded-xl border border-accent/50 text-accent font-medium hover:bg-accent/10 transition-colors font-body"
+          >
+            Browse Categories
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div
+          class="reveal grid grid-cols-3 gap-4 mt-20 max-w-xl mx-auto"
+          style="transition-delay: 0.4s"
+        >
+          <div class="glass rounded-xl p-4 text-center">
+            <div
+              class="font-display text-2xl font-bold text-white counter"
+              data-target="1000"
+            >
+              0
+            </div>
+            <div class="text-xs text-muted mt-1">AI Tools</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center">
+            <div
+              class="font-display text-2xl font-bold text-white counter"
+              data-target="50"
+            >
+              0
+            </div>
+            <div class="text-xs text-muted mt-1">Categories</div>
+          </div>
+          <div class="glass rounded-xl p-4 text-center">
+            <div
+              class="font-display text-2xl font-bold text-white counter"
+              data-target="12"
+            >
+              0
+            </div>
+            <div class="text-xs text-muted mt-1">AI Models</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-muted"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+          />
+        </svg>
+      </div>
+    </section>
+
+    <!-- Top 20 AI Section -->
+    <section id="top20" class="relative py-24 px-4">
+      <div class="max-w-7xl mx-auto">
+        <div class="reveal text-center mb-16">
+          <span
+            class="inline-block px-3 py-1 rounded-full bg-tertiary/10 text-tertiary text-xs font-display tracking-widest mb-4"
+            >RANKED BY POWER</span
+          >
+          <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">
+            TOP 20 AI GODS
+          </h2>
+          <p class="text-muted max-w-xl mx-auto font-body">
+            The most powerful entities in the digital realm, ranked by
+            intelligence, speed, and influence.
+          </p>
+        </div>
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          id="top20Grid"
+        ></div>
+      </div>
+    </section>
+
+    <!-- AI Comparison Lab -->
+    <section id="lab" class="relative py-24 px-4 bg-surface/50">
+      <div class="max-w-6xl mx-auto">
+        <div class="reveal text-center mb-16">
+          <span
+            class="inline-block px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-display tracking-widest mb-4"
+            >ANALYSIS MODULE</span
+          >
+          <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">
+            AI COMPARISON LAB
+          </h2>
+          <p class="text-muted max-w-xl mx-auto font-body">
+            Dissolve uncertainty. Compare AI DNA side-by-side with precision
+            metrics.
+          </p>
+        </div>
+
+        <div class="reveal glass rounded-2xl p-6 lg:p-8">
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- Tool 1 -->
+            <div class="space-y-4">
+              <select
+                id="compare1"
+                class="w-full px-4 py-3 rounded-xl bg-bg border border-border text-white font-display focus:border-accent outline-none"
+              >
+                <!-- Options injected by JS -->
+              </select>
+              <div id="stats1" class="space-y-3"></div>
+              <div
+                class="radar-bg rounded-xl p-4 aspect-square flex items-center justify-center"
+                id="radar1"
+              >
+                <svg viewBox="0 0 100 100" class="w-full h-full max-w-[200px]">
+                  <polygon
+                    points="50,10 90,35 90,75 50,100 10,75 10,35"
+                    fill="none"
+                    stroke="rgba(0,240,255,0.2)"
+                    stroke-width="0.5"
+                  />
+                  <polygon
+                    id="radarPoly1"
+                    points="50,50 50,50 50,50 50,50 50,50"
+                    fill="rgba(0,240,255,0.2)"
+                    stroke="var(--accent)"
+                    stroke-width="1"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Tool 2 -->
+            <div class="space-y-4">
+              <select
+                id="compare2"
+                class="w-full px-4 py-3 rounded-xl bg-bg border border-border text-white font-display focus:border-secondary outline-none"
+              >
+                <!-- Options injected by JS -->
+              </select>
+              <div id="stats2" class="space-y-3"></div>
+              <div
+                class="radar-bg rounded-xl p-4 aspect-square flex items-center justify-center"
+                id="radar2"
+              >
+                <svg viewBox="0 0 100 100" class="w-full h-full max-w-[200px]">
+                  <polygon
+                    points="50,10 90,35 90,75 50,100 10,75 10,35"
+                    fill="none"
+                    stroke="rgba(191,0,255,0.2)"
+                    stroke-width="0.5"
+                  />
+                  <polygon
+                    id="radarPoly2"
+                    points="50,50 50,50 50,50 50,50 50,50"
+                    fill="rgba(191,0,255,0.2)"
+                    stroke="var(--secondary)"
+                    stroke-width="1"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Universe Map -->
+    <section id="universe" class="relative py-24 px-4">
+      <div class="max-w-7xl mx-auto">
+        <div class="reveal text-center mb-16">
+          <span
+            class="inline-block px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-display tracking-widest mb-4"
+            >COSMIC VIEW</span
+          >
+          <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">
+            AI UNIVERSE MAP
+          </h2>
+          <p class="text-muted max-w-xl mx-auto font-body">
+            Navigate the galaxy of artificial intelligence. Each node represents
+            a distinct category cluster.
+          </p>
+        </div>
+        <div
+          class="reveal relative h-[500px] w-full rounded-2xl glass overflow-hidden"
+          id="universeMap"
+        >
+          <!-- Canvas or SVG map drawn by JS -->
+          <canvas id="mapCanvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="categories" class="relative py-24 px-4 bg-surface/30">
+      <div class="max-w-7xl mx-auto">
+        <div class="reveal text-center mb-16">
+          <span
+            class="inline-block px-3 py-1 rounded-full bg-tertiary/10 text-tertiary text-xs font-display tracking-widest mb-4"
+            >BROWSE</span
+          >
+          <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">
+            50 AI CATEGORIES
+          </h2>
+          <p class="text-muted max-w-xl mx-auto font-body">
+            Swipe through the infinite corridors of AI capabilities.
+          </p>
+        </div>
+        <div id="categoriesContainer" class="space-y-10"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative py-16 px-4 border-t border-border bg-bg">
+      <div class="max-w-7xl mx-auto text-center">
+        <div class="flex items-center justify-center gap-3 mb-6">
+          <div
+            class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center"
+          >
+            <span class="font-display font-black text-xl text-bg">S</span>
+          </div>
+          <span class="font-display font-bold text-2xl tracking-widest"
+            >SHIKYO'S AI</span
+          >
+        </div>
+        <p class="text-muted text-sm font-body">
+          The Ultimate AI God Platform. 1000 Tools. 50 Categories. Infinite
+          Power.
+        </p>
+        <div class="flex justify-center gap-6 mt-8 text-muted">
+          <a href="#" class="hover:text-accent transition-colors">About</a>
+          <a href="#" class="hover:text-accent transition-colors">API</a>
+          <a href="#" class="hover:text-accent transition-colors">Contribute</a>
+        </div>
+        <p class="text-xs text-muted mt-8 font-body">
+          2025 Shikyo Systems. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Scroll to Top -->
+    <button
+      id="scrollTop"
+      class="fixed bottom-8 right-8 w-12 h-12 rounded-xl bg-surface border border-border text-accent flex items-center justify-center opacity-0 transition-opacity z-40 hover:bg-card"
+      aria-label="Scroll to top"
+    >
+      <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 10l7-7m0 0l7 7m-7-7v18"
+        />
+      </svg>
+    </button>
+
+    <script>
+      // ==========================================
+      // DATA GENERATION - 50 Categories, 1000 Tools
+      // ==========================================
+
+      const categoryNames = [
+        "Chatbots",
+        "Image Gen",
+        "Video Tools",
+        "Code Assist",
+        "Voice AI",
+        "Writing",
+        "Productivity",
+        "Design",
+        "Business",
+        "Automation",
+        "Data Science",
+        "Marketing",
+        "Research",
+        "Education",
+        "Finance",
+        "Healthcare",
+        "Gaming",
+        "Music Gen",
+        "Translation",
+        "Cybersecurity",
+        "Legal AI",
+        "HR Tech",
+        "Real Estate",
+        "AgriTech",
+        "Energy",
+        "Climate AI",
+        "Robotics",
+        "Autonomous Vehicles",
+        "AR/VR",
+        "3D Modeling",
+        "Animation",
+        "NLP",
+        "Computer Vision",
+        "Recommendation",
+        "Personalization",
+        "Search",
+        "OCR",
+        "Sentiment Analysis",
+        "Forecasting",
+        "Predictive AI",
+        "Generative Art",
+        "Synthetic Data",
+        "Model Training",
+        "MLOps",
+        "Edge AI",
+        "Quantum AI",
+        "Ethical AI",
+        "Explainable AI",
+        "No-Code AI",
+        "AI Assistants",
+      ];
+
+      const toolPrefixes = [
+        "Neo",
+        "Syn",
+        "Omni",
+        "Hyper",
+        "Meta",
+        "Cyber",
+        "Quant",
+        "Aero",
+        "Neuro",
+        "Astro",
+        "Flux",
+        "Zen",
+        "Apex",
+        "Core",
+        "Nova",
+      ];
+      const toolSuffixes = [
+        "Mind",
+        "Brain",
+        "Lens",
+        "Wave",
+        "Flow",
+        "Sphere",
+        "Node",
+        "Grid",
+        "Matrix",
+        "Link",
+        "Bot",
+        "Sense",
+        "Vision",
+        "Gen",
+        "AI",
+      ];
+
+      // Generate 50 Categories
+      const categories = categoryNames.map((name, idx) => ({
+        id: `cat-${idx}`,
+        name: name,
+        color: ["accent", "secondary", "tertiary"][idx % 3],
+      }));
+
+      // Generate 1000 Tools
+      const allTools = [];
+      for (let i = 0; i < 1000; i++) {
+        const catIdx = i % 50;
+        const prefix =
+          toolPrefixes[Math.floor(Math.random() * toolPrefixes.length)];
+        const suffix =
+          toolSuffixes[Math.floor(Math.random() * toolSuffixes.length)];
+
+        allTools.push({
+          id: `tool-${i}`,
+          name: `${prefix}${suffix} ${i + 1}`,
+          description: `Advanced ${categories[catIdx].name.toLowerCase()} solution powered by next-gen neural architectures.`,
+          category: categories[catIdx].id,
+          categoryName: categories[catIdx].name,
+          rank: i + 1,
+          metrics: {
+            intelligence: Math.floor(Math.random() * 30) + 70,
+            speed: Math.floor(Math.random() * 40) + 60,
+            cost: Math.floor(Math.random() * 50) + 50,
+            popularity: Math.floor(Math.random() * 40) + 60,
+            innovation: Math.floor(Math.random() * 30) + 70,
+          },
+        });
+      }
+
+      // Assign "Top 20" based on a score
+      allTools.sort((a, b) => {
+        const scoreA = Object.values(a.metrics).reduce((s, v) => s + v, 0);
+        const scoreB = Object.values(b.metrics).reduce((s, v) => s + v, 0);
+        return scoreB - scoreA;
+      });
+      allTools.forEach((t, i) => (t.rank = i + 1));
+      const top20 = allTools.slice(0, 20);
+
+      // ==========================================
+      // DOM RENDERING
+      // ==========================================
+
+      // Render Top 20
+      function renderTop20() {
+        const grid = document.getElementById("top20Grid");
+        if (!grid) return;
+        grid.innerHTML = top20
+          .map(
+            (tool, i) => `
+        <div class="reveal glass rounded-xl p-5 group hover:border-accent/30 transition-all duration-300 tilt-card" style="transition-delay: ${i * 40}ms;">
+          <div class="flex justify-between items-start mb-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-accent/20 to-secondary/20 flex items-center justify-center font-display font-bold text-accent group-hover:scale-110 transition-transform">
+              #${i + 1}
+            </div>
+            <span class="text-xs text-muted bg-bg px-2 py-1 rounded">${tool.categoryName}</span>
+          </div>
+          <h3 class="font-display font-bold text-lg mb-1 text-white group-hover:text-accent transition-colors">${tool.name}</h3>
+          <p class="text-xs text-muted line-clamp-2 mb-3 font-body">${tool.description}</p>
+          <div class="h-1 w-full bg-bg rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-accent to-secondary" style="width: ${tool.metrics.intelligence}%;"></div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      // Render Categories & Carousels
+      function renderCategories() {
+        const container = document.getElementById("categoriesContainer");
+        if (!container) return;
+
+        container.innerHTML = categories
+          .map((cat, idx) => {
+            const tools = allTools.filter((t) => t.category === cat.id);
+            return `
+          <div class="reveal" style="transition-delay: ${(idx % 5) * 100}ms;">
+            <div class="flex justify-between items-center mb-4 px-2">
+              <h3 class="font-display text-lg font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-${cat.color}"></span>
+                ${cat.name}
+                <span class="text-xs text-muted font-body font-normal">${tools.length} tools</span>
+              </h3>
+              <div class="flex gap-2">
+                 <button class="carousel-prev w-8 h-8 rounded-lg bg-bg border border-border flex items-center justify-center text-muted hover:text-white transition-colors" data-target="caro-${cat.id}">
+                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                 </button>
+                 <button class="carousel-next w-8 h-8 rounded-lg bg-bg border border-border flex items-center justify-center text-muted hover:text-white transition-colors" data-target="caro-${cat.id}">
+                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                 </button>
+              </div>
+            </div>
+            <div id="caro-${cat.id}" class="carousel-track">
+              ${tools
+                .map(
+                  (tool) => `
+                <div class="carousel-item w-64 flex-shrink-0">
+                  <div class="glass rounded-lg p-4 h-full flex flex-col hover:border-${cat.color}/30 transition-colors group">
+                    <span class="text-xs text-muted mb-2">${tool.categoryName}</span>
+                    <h4 class="font-display font-bold text-white group-hover:text-${cat.color} transition-colors">${tool.name}</h4>
+                    <p class="text-xs text-muted mt-1 line-clamp-2 flex-grow font-body">${tool.description}</p>
+                    <div class="mt-3 pt-3 border-t border-border/50 flex justify-between items-center">
+                      <span class="text-xs text-muted">Rank #${tool.rank}</span>
+                      <button class="text-xs text-accent hover:underline">View</button>
+                    </div>
+                  </div>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          </div>
+        `;
+          })
+          .join("");
+
+        // Attach carousel listeners
+        document
+          .querySelectorAll(".carousel-prev, .carousel-next")
+          .forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const id = btn.dataset.target;
+              const track = document.getElementById(id);
+              const scroll = btn.classList.contains("carousel-prev")
+                ? -300
+                : 300;
+              track.scrollBy({ left: scroll, behavior: "smooth" });
+            });
+          });
+      }
+
+      // Populate Comparison Selects
+      function populateCompareSelects() {
+        const sel1 = document.getElementById("compare1");
+        const sel2 = document.getElementById("compare2");
+        if (!sel1 || !sel2) return;
+
+        const options = top20
+          .map((t) => `<option value="${t.id}">${t.name}</option>`)
+          .join("");
+        sel1.innerHTML = options;
+        sel2.innerHTML = options;
+        sel2.selectedIndex = 1; // Default to second best
+
+        sel1.addEventListener("change", updateComparison);
+        sel2.addEventListener("change", updateComparison);
+        updateComparison();
+      }
+
+      function updateComparison() {
+        const id1 = document.getElementById("compare1").value;
+        const id2 = document.getElementById("compare2").value;
+
+        const tool1 = allTools.find((t) => t.id === id1);
+        const tool2 = allTools.find((t) => t.id === id2);
+
+        if (!tool1 || !tool2) return;
+
+        const metricNames = [
+          "intelligence",
+          "speed",
+          "cost",
+          "popularity",
+          "innovation",
+        ];
+
+        // Render Stats
+        const html1 = metricNames
+          .map(
+            (m) => `
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="capitalize text-muted font-body">${m}</span>
+            <span class="font-display text-accent">${tool1.metrics[m]}</span>
+          </div>
+          <div class="h-2 bg-bg rounded-full overflow-hidden">
+            <div class="progress-bar bg-accent" style="width: ${tool1.metrics[m]}%;"></div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+
+        const html2 = metricNames
+          .map(
+            (m) => `
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="capitalize text-muted font-body">${m}</span>
+            <span class="font-display text-secondary">${tool2.metrics[m]}</span>
+          </div>
+          <div class="h-2 bg-bg rounded-full overflow-hidden">
+            <div class="progress-bar bg-secondary" style="width: ${tool2.metrics[m]}%;"></div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+
+        document.getElementById("stats1").innerHTML = html1;
+        document.getElementById("stats2").innerHTML = html2;
+
+        // Render Radar Charts
+        drawRadar("radarPoly1", tool1.metrics);
+        drawRadar("radarPoly2", tool2.metrics, true);
+      }
+
+      function drawRadar(id, metrics, secondary = false) {
+        const poly = document.getElementById(id);
+        if (!poly) return;
+        const values = Object.values(metrics);
+        const center = 50;
+        const radius = 35;
+
+        // Map 0-100 to radial points
+        const points = values
+          .map((val, i) => {
+            const angle = (Math.PI * 2 * i) / values.length - Math.PI / 2;
+            const r = (val / 100) * radius;
+            return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
+          })
+          .join(" ");
+
+        poly.setAttribute("points", points);
+      }
+
+      // Command Palette Logic
+      function toggleCmdPalette() {
+        const el = document.getElementById("cmdPalette");
+        el.classList.toggle("active");
+        if (el.classList.contains("active")) {
+          document.getElementById("cmdInput").focus();
+        }
+      }
+
+      document.getElementById("cmdInput").addEventListener("input", (e) => {
+        const q = e.target.value.toLowerCase();
+        const results = document.getElementById("cmdResults");
+
+        if (!q) {
+          results.innerHTML = `<div class="p-4 text-center text-muted text-sm">Type to search...</div>`;
+          return;
+        }
+
+        const found = allTools
+          .filter(
+            (t) =>
+              t.name.toLowerCase().includes(q) ||
+              t.categoryName.toLowerCase().includes(q),
+          )
+          .slice(0, 10);
+
+        results.innerHTML = found.length
+          ? found
+              .map(
+                (t) => `
+        <button class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-card text-left" onclick="document.getElementById('${t.category}').scrollIntoView({behavior: 'smooth'}); toggleCmdPalette();">
+          <div class="w-8 h-8 rounded bg-gradient-to-br from-accent/20 to-secondary/20 flex items-center justify-center text-xs font-display text-accent">${t.rank}</div>
+          <div>
+            <div class="text-sm text-white">${t.name}</div>
+            <div class="text-xs text-muted">${t.categoryName}</div>
+          </div>
+        </button>
+      `,
+              )
+              .join("")
+          : `<div class="p-4 text-center text-muted">No results for "${q}"</div>`;
+      });
+
+      // Close on ESC or Click Outside
+      document.getElementById("cmdPalette").addEventListener("click", (e) => {
+        if (e.target.id === "cmdPalette") toggleCmdPalette();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape")
+          document.getElementById("cmdPalette").classList.remove("active");
+        if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+          e.preventDefault();
+          toggleCmdPalette();
+        }
+      });
+
+      // ==========================================
+      // CANVAS VISUALIZATIONS
+      // ==========================================
+
+      // Hero Canvas (Particles)
+      function initHeroCanvas() {
+        const canvas = document.getElementById("heroCanvas");
+        const ctx = canvas.getContext("2d");
+        let w,
+          h,
+          particles = [];
+
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+          constructor() {
+            this.reset();
+          }
+          reset() {
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+            this.size = Math.random() * 1.5;
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.5;
+            this.color = `rgba(${Math.random() > 0.5 ? "0, 240, 255" : "191, 0, 255"}, ${Math.random() * 0.5 + 0.2})`;
+          }
+          update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > w || this.y < 0 || this.y > h)
+              this.reset();
+          }
+          draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        function init() {
+          resize();
+          particles = [];
+          for (let i = 0; i < 80; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+          ctx.clearRect(0, 0, w, h);
+
+          // Draw connections
+          particles.forEach((p1, i) => {
+            particles.slice(i + 1).forEach((p2) => {
+              const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+              if (dist < 150) {
+                ctx.strokeStyle = `rgba(0, 240, 255, ${0.05 * (1 - dist / 150)})`;
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+              }
+            });
+          });
+
+          particles.forEach((p) => {
+            p.update();
+            p.draw();
+          });
+          requestAnimationFrame(animate);
+        }
+
+        window.addEventListener("resize", init);
+        init();
+        animate();
+      }
+
+      // ==========================================
+      // INTERACTIONS & UTILS
+      // ==========================================
+
+      // Scroll Progress
+      window.addEventListener("scroll", () => {
+        const scrollTop = document.documentElement.scrollTop;
+        const scrollHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const progress = (scrollTop / scrollHeight) * 100;
+        document.getElementById("scrollProgress").style.width = `${progress}%`;
+
+        // Reveal animations
+        document.querySelectorAll(".reveal").forEach((el) => {
+          const top = el.getBoundingClientRect().top;
+          if (top < window.innerHeight - 100) el.classList.add("active");
+        });
+
+        // Navbar background
+        const nav = document.getElementById("navbar");
+        if (scrollTop > 50) nav.classList.add("glass");
+        else nav.classList.remove("glass");
+
+        // Scroll to top button
+        const btn = document.getElementById("scrollTop");
+        if (scrollTop > 500) btn.style.opacity = "1";
+        else btn.style.opacity = "0";
+      });
+
+      document.getElementById("scrollTop").addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Counters
+      function animateCounters() {
+        document.querySelectorAll(".counter").forEach((counter) => {
+          const target = parseInt(counter.dataset.target);
+          const duration = 2000;
+          const start = performance.now();
+
+          const update = (t) => {
+            const progress = Math.min((t - start) / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const val = Math.floor(ease * target);
+            counter.innerText = val.toLocaleString();
+            if (progress < 1) requestAnimationFrame(update);
+          };
+          requestAnimationFrame(update);
+        });
+      }
+
+      // Tilt Effect
+      document.querySelectorAll(".tilt-card").forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const rx = (y - rect.height / 2) / 10;
+          const ry = -(x - rect.width / 2) / 10;
+          card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.02)`;
+        });
+        card.addEventListener("mouseleave", () => {
+          card.style.transform =
+            "perspective(1000px) rotateX(0) rotateY(0) scale(1)";
+        });
+      });
+
+      // ==========================================
+      // INIT
+      // ==========================================
+      document.addEventListener("DOMContentLoaded", () => {
+        renderTop20();
+        renderCategories();
+        populateCompareSelects();
+        initHeroCanvas();
+        initUniverseMap();
+        animateCounters();
+
+        // Trigger initial reveals
+        setTimeout(() => {
+          document.querySelectorAll(".reveal").forEach((el) => {
+            if (el.getBoundingClientRect().top < window.innerHeight)
+              el.classList.add("active");
+          });
+        }, 100);
+      });
+    </script>
+  </body>
+  <script>
+    (function () {
+      if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+        window.chatbase = (...arguments) => {
+          if (!window.chatbase.q) {
+            window.chatbase.q = [];
+          }
+          window.chatbase.q.push(arguments);
+        };
+        window.chatbase = new Proxy(window.chatbase, {
+          get(target, prop) {
+            if (prop === "q") {
+              return target.q;
+            }
+            return (...args) => target(prop, ...args);
+          },
+        });
+      }
+      const onLoad = function () {
+        const script = document.createElement("script");
+        script.src = "https://www.chatbase.co/embed.min.js";
+        script.id = "YQa7mO6D98j95T3hFx2IC";
+        script.domain = "www.chatbase.co";
+        document.body.appendChild(script);
+      };
+      if (document.readyState === "complete") {
+        onLoad();
+      } else {
+        window.addEventListener("load", onLoad);
+      }
+    })();
+  </script>
+</html>
